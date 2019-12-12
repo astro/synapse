@@ -37,10 +37,11 @@ impl Choker {
 
     fn unchoke_random<T: cio::CIO>(&mut self, peers: &mut UHashMap<Peer<T>>) -> Option<usize> {
         if let Some(random_id) = random_sample(self.interested.iter()).cloned() {
-            let mut peer = peers.get_mut(&random_id).unwrap();
-            self.interested.remove(&random_id);
-            self.add_peer(&mut peer);
-            Some(random_id)
+            peers.get_mut(&random_id).map(|mut peer| {
+                self.interested.remove(&random_id);
+                self.add_peer(&mut peer);
+                random_id
+            })
         } else {
             None
         }
